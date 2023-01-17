@@ -2,14 +2,47 @@ import { auth, db } from "../utils/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 export default function Post() {
   //form state
   const [post, setPost] = useState({ description: "" });
+  const [user, loading] = useAuthState(auth);
+  const route = useRouter();
 
   //submit post
   const submitPost = async (e) => {
     e.preventDefault();
+
+    //Run checks for description
+    if (!post.description) {
+      toast.error("Description Field empty 😅", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 1500,
+      });
+      return;
+    }
+    if (post.description.length > 300) {
+      toast.error("Description too long😅", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 1500,
+      });
+
+      return;
+    }
+
+    //Make a new post
+    const collectionRef = collection(db, "posts");
+    await addDoc(collectionRef, {
+      ...post,
+      timestamp: serverTimestamp(),
+      user: user.uid,
+      avatar: user.photoURL,
+      username: user.displayName,
+    });
+    setPost({ description: "" });
+    return route.push("/");
   };
 
   return (
@@ -24,8 +57,8 @@ export default function Post() {
             className="bg-gray-800 h-48 w-full text-white rounded-lg p-2 text-sm"
           ></textarea>
           <p
-            className={`text-cyan-600 font-medium text-sm ${
-              post.description.length > 300 ? "text-red-800" : ""
+            className={`text-cyan-500 font-medium text-sm ${
+              post.description.length > 300 ? "text-red-500" : ""
             } `}
           >
             {""}

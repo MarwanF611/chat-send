@@ -14,6 +14,7 @@ import Message from "../components/message";
 import { BsTrash2Fill } from "react-icons/bs";
 import { AiFillEdit } from "react-icons/ai";
 import { async } from "@firebase/util";
+import Link from "next/link";
 
 export default function dashboard() {
   const route = useRouter();
@@ -56,10 +57,12 @@ export default function dashboard() {
                   <BsTrash2Fill className="text-2x1" />
                   Delete
                 </button>
-                <button className="text-cyan-500 flex items-center justify-center gap-2 py-2 text-sm">
-                  <AiFillEdit className="text-2x1" />
-                  Edit
-                </button>
+                <Link href={{pathname: "/post", query: post }}>
+                  <button className="text-cyan-500 flex items-center justify-center gap-2 py-2 text-sm">
+                    <AiFillEdit className="text-2x1" />
+                    Edit
+                  </button>
+                </Link>
               </div>
             </Message>
           );
